@@ -13,10 +13,11 @@ SCC <- readRDS("Source_Classification_Code.rds")
 
 NEI <- NEI[NEI$fips=="24510",]
 byYear<-ddply(NEI,c("year"),function(row) sum(row$Emissions))
+colnames(byYear)<-c("year","count")
 
 #Start PNG graphics
 png(file="plot2.png",width=480,height=480)
-plot(byYear, xlab="Year",ylab="PM2.5 Emissions",main="Plot of PM2.5 Emissions By Year in Baltimore")
+plot(byYear, xlab="Year",ylab="PM2.5 Emissions",main="Plot of PM2.5 Emissions By Year",type="o",col="red")
 
 #And we're done
 dev.off()

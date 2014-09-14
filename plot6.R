@@ -6,19 +6,21 @@
 
 ######################################################################################
 
+library(plyr)
+library(ggplot2)
+
 NEI <- readRDS("summarySCC_PM25.rds")
 SCC <- readRDS("Source_Classification_Code.rds")
 
+NEI <- NEI[NEI$type == 'ON-ROAD',]
 NEI <- NEI[NEI$fips=="24510" | NEI$fips=="06037",]
-carIdx<-grep("motor vehicle",tolower(SCC$Short.Name),fixed = TRUE)
-SCC<-SCC[carIdx,c("SCC","Short.Name")]
-NEI<-merge(NEI, SCC, by="SCC")
 byYearAndFips<-ddply(NEI,c("year","fips"),function(row) sum(row$Emissions))
+colnames(byYearAndFips)<-c("year", "fips", "count")
 
 #Start PNG graphics
 png(file="plot6.png",width=480,height=480)
-g<-ggplot(byYearAndFips, aes(x=byYearAndFips$year, y=byYearAndFips$V1, color = byYearAndFips$fips)) 
-g<-g + geom_point() + xlab("Year") + ylab("PM2.5 Emissions")
+g<-ggplot(byYearAndFips, aes(x=year, y=count, color = fips)) 
+g<-g + geom_line(aes(width=2.0)) + xlab("Year") + ylab("PM2.5 Emissions")
 print(g)
 
 #And we're done

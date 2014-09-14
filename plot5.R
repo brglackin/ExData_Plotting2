@@ -5,18 +5,24 @@
 
 ######################################################################################
 
+library(plyr)
+library(ggplot2)
+
 NEI <- readRDS("summarySCC_PM25.rds")
 SCC <- readRDS("Source_Classification_Code.rds")
 
-NEI <- NEI[NEI$fips=="24510",]
-carIdx<-grep("motor vehicle",tolower(SCC$Short.Name),fixed = TRUE)
-SCC<-SCC[carIdx,c("SCC","Short.Name")]
-NEI<-merge(NEI, SCC, by="SCC")
+NEI <- NEI[NEI$fips=="24510" & NEI$type == 'ON-ROAD',]
 byYear<-ddply(NEI,c("year"),function(row) sum(row$Emissions))
+colnames(byYear)<-c("year", "count")
 
 #Start PNG graphics
 png(file="plot5.png",width=480,height=480)
-plot(byYear, xlab="Year",ylab="PM2.5 Emissions",main="Plot of PM2.5 Emissions By Year for Cars in Baltimore")
+g<-ggplot(data=byYear, aes(x=year, y=count)) + 
+  geom_line() + geom_point(aes(size=2)) + 
+  ggtitle('Total Emissions of PM2.5 from Coal Combustion') + 
+  ylab('PM2.5 Emissions (in thousands)') + xlab('Year') + 
+  geom_text(aes(label=round(count,digits=0), size=2, hjust=1.5, vjust=1.5))
+print(g)
 
 #And we're done
 dev.off()

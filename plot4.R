@@ -5,17 +5,23 @@
 
 ######################################################################################
 
+#For this, we will retrieve all entries in the SCC file with the word coal
+# and examine NEI data for those SCC values
 library(plyr)
 library(ggplot2)
 
 NEI <- readRDS("summarySCC_PM25.rds")
 SCC <- readRDS("Source_Classification_Code.rds")
 
+#Find all coal entries
 coalIdx<-grep("coal",tolower(SCC$Short.Name),fixed = TRUE)
 SCC<-SCC[coalIdx,c("SCC","Short.Name")]
+#Inner join the NEI table with our coal SCC entries, therby removing the rest
 NEI<-merge(NEI, SCC, by="SCC")
+#Aggregate by year and get the total emissions
 byYear<-ddply(NEI,c("year"),function(row) sum(row$Emissions))
 colnames(byYear)<-c("year", "count")
+#Scale the emissions to thousands for better display
 byYear$count<-round(byYear$count/1000)
 
 #Start PNG graphics

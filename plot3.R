@@ -7,18 +7,24 @@
 
 ######################################################################################
 
+#For this we use the ggplot2 plotting function, splitting the data by type
+
 library(plyr)
 library(ggplot2)
 
 NEI <- readRDS("summarySCC_PM25.rds")
 SCC <- readRDS("Source_Classification_Code.rds")
 
+#Only need to retain Baltimore data
 NEI <- NEI[NEI$fips=="24510",]
+#Aggregate by year and type, getting total emissions
 byYearAndType<-ddply(NEI,c("year","type"),function(row) sum(row$Emissions))
 colnames(byYearAndType)<-c("year", "type", "count")
+#Change the year to character type for display purposes
+byYearAndType$year<-as.character(byYearAndType$year)
 
 #Start PNG graphics
-png(file="plot3.png",width=480,height=480)
+png(file="plot3.png")
 g<-ggplot(data=byYearAndType, aes(x=year, y=count)) + facet_grid(. ~ type) + guides(fill=F) +
   geom_bar(aes(fill=type),stat="identity") +
   ylab('PM2.5 Emissions') + xlab('Year') + 

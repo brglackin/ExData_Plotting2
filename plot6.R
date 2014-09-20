@@ -27,11 +27,11 @@ byYearAndFips$count<-log(byYearAndFips$count)
 
 #Start PNG graphics
 #For this graph, we're going to remove the ggplot background
-png(file="plot6.png",width=480,height=480)
+png(file="plot6.png")
 g<-ggplot(byYearAndFips, aes(x=year, y=count, color = city)) 
 g<-g + geom_line(aes(width=3.0)) + xlab("Year") + ylab("log PM2.5 Emissions")
-g<-g + ggtitle('Motor Vehicle Emissions of PM2.5 in Baltimore and Los Angeles') 
-g<-g + theme(panel.background = element_blank())
+g<-g + ggtitle('    Motor Vehicle Emissions of PM2.5 in Baltimore and Los Angeles') 
+g<-g + theme_bw()
 print(g)
 
 #And we're done
